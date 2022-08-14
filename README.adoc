@@ -1,0 +1,31 @@
+:source-highlighter: rouge
+:icons: font
+:stylesheet: style.css
+:toc: left
+:sectanchors:
+
+[source,clojure]
+----
+(require '[io.chouser.spread :refer [k.]])
+
+(k. :a "alpha")          ;;=> {:a "alpha"}
+
+(let [b "beta"]
+  (k. b, :c "charlie"))  ;;=> {:b "beta" :c "charlie"}
+
+(let [b "beta"
+      m {:x 7, :y 9}]
+  (k. b, ...m))          ;;=> {:b "beta" :x 7 :y 9}
+----
+
+Mix and match keyword/value pairs, bare symbols, and ellipsis (spread) prefixes
+to construct a map. Similar to
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#property_definitions[property shorthand] and
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#spread_properties[spread syntax]
+in https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer[JavaScript Object initializers]
+
+The `k.` macro (a.k.a. `keys.`) works well for constructing
+maps that will be destructured with `{:keys []}`. Also available are `strs.` and
+`syms.` macros for `{:strs []}` and `{:syms []}` destructuring respectively.
+
+Thanks to Timothy Pratley for pairing on this!

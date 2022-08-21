@@ -15,7 +15,8 @@
   (is (= (merge {:h "hotel"} mef) (k. :h "hotel" ~@ mef)))
   (is (= {:h "hotel" :e 3} (k. :h "hotel" ~@(dissoc mef :f))))
   (is (= mef (k. :e 9 ~@mef)))
-  (is (= {:e 9 :f 4} (k. ~@mef :e 9))))
+  (is (= {:e 9 :f 4} (k. ~@mef :e 9)))
+  (is (= {"alpha" "beta"} (k. ~a b))))
 
 (deftest all-macros
   (is (= (merge {:a a :b b} mef) (k.    a ~@mef b)))

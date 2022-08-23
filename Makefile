@@ -1,4 +1,4 @@
-.PHONY: all setup update clean test
+.PHONY: all setup update test
 
 all: setup test
 
@@ -7,9 +7,6 @@ setup:
 
 update:
 	clojure -M:outdated --every --write
-
-clean:
-	rm -rf target/public
 
 test:
 	clojure -M:test

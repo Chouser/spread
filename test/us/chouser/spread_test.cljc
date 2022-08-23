@@ -1,12 +1,21 @@
 (ns us.chouser.spread-test
   (:require [us.chouser.spread :refer [k. keys. strs. syms.] :as s]
-            [clojure.test :refer [test-ns deftest is]]))
+            [clojure.test :refer [deftest is use-fixtures]]))
 
 (def a "alpha")
 (def b "beta")
 (def mcd {:c "charlie" :d "delta"})
 (def mef {:e 3 :f 4})
 (def m1234 [[1 2] [3 4]])
+
+;; this ridiculous fixture is required to run the tests that use macroexpand in a test runner
+;; https://github.com/technomancy/leiningen/issues/912
+(let [ns *ns*]
+  (use-fixtures
+    :once
+    (fn [test-fn]
+      (binding [*ns* ns]
+        (test-fn)))))
 
 (deftest basic-keywords
   (is (= {:a a} (k. a)))

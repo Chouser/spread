@@ -4,9 +4,19 @@
 :toc: left
 :sectanchors:
 
+== The map constructor
+
+A map constructor for Clojure/Script
+which emulates JavaScript's ES6 object creation shorthand
+by introducing shorthand notation.
+
+    {us.chouser/spread {:mvn/version "0.0.1"}}
+
+== Usage
+
 [source,clojure]
 ----
-(require '[io.chouser.spread :refer [k.]])
+(require '[us.chouser.spread :refer [k.]])
 
 (k. :a "alpha")          ;;=> {:a "alpha"}
 
@@ -15,7 +25,7 @@
 
 (let [b "beta"
       m {:x 7, :y 9}]
-  (k. b, ...m))          ;;=> {:b "beta" :x 7 :y 9}
+  (k. b, ~@m))          ;;=> {:b "beta" :x 7 :y 9}
 ----
 
 Mix and match keyword/value pairs, bare symbols, and ellipsis (spread) prefixes
@@ -28,4 +38,87 @@ The `k.` macro (a.k.a. `keys.`) works well for constructing
 maps that will be destructured with `{:keys []}`. Also available are `strs.` and
 `syms.` macros for `{:strs []}` and `{:syms []}` destructuring respectively.
 
-Thanks to Timothy Pratley for pairing on this!
+See link:src/test/us.chouser/spread_test.clj[] for all usages.
+
+=== Sequences, vectors and sets
+
+Clojure has a built-in spread operator that you should prefer:
+
+    `[0 1 ~@(range 2 4)] => [0 1 2 3]
+
+== Rationale
+
+ES6 introduced object initialization shorthand notation to JavaScript,
+which has been widely adopted and accepted as a concise and clear way to create data literals.
+Allowing for symbols to represent pairs is syntactic sugar that saves repetition at the cost of extra syntax.
+The evidence that this is reasonable and desirable is that the syntax was quickly adopted by the JavaScript community.
+
+The spread notation was selected to match Clojure's exising `~@` syntax for sequences.
+Unfortunately `~@` does not work inside maps because the Clojure reader enforces an even number of forms inside a map literal,
+without considering the effects of unsplicing:
+
+[source,clojure]
+----
+`{0 1 ~@(range 2 4)} => Exception
+----
+
+Improving the Clojure reader to handle this case would appear to be a reasonable thing to do.
+
+It is possible to trick the reader by providing 2 `~@` forms:
+
+[source,clojure]
+----
+`{0 1 ~@(range 2 4) ~@nil}
+=> {0 1, 2 3}
+----
+
+Alternative notations considered were `...` and `&` which are both interesting.
+`&` is symmetrical with destructuring.
+`...` is more common outside of Clojure.
+Both introduce a minor ambiguity where `...m` is the same as `... m` (or `&m` is the same as `& m`).
+`~@` Does not have this ambiguity because it always means `(unquote-splicing <expr>)` whether used with a symbol or any other expression.
+
+== Goals
+
+Given some pre-existing bindings...
+
+[source,clojure]
+----
+(def a "alpha")
+(def b "beta")
+(def m {:foo :bar})
+----
+
+=== Compatible with existing map construction
+
+`(k. :k 100)` => `{:k 100}`
+
+=== A symbol is read as a key value pair
+
+`(k. a b)` => `{:a "alpha", :b "beta"}`
+
+=== Escaping (only in key position)
+
+`(k. ~a ~b)` => `{"alpha" "beta"}`
+
+=== Spreading
+
+`(k. ~@m)` => `{:foo :bar}`
+
+=== Inline expressions
+
+`(k. ~@(apply array-map (range 4)))` => `{0 1, 2 3}`
+
+=== Mixing, matching, and composing
+
+`(k. a b :c 3 ~a 5 ~@m ~@(apply array-map (range 10 14)) ~@(strs. a b))`
+=> `{:a "alpha", :b "beta", :c 3, "alpha" 5, :foo :bar,
+     10 11, 12 13,
+     "a" "alpha", "b" "beta"}`
+
+== Final thoughts
+
+image::https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Workshop_of_Titian_-_Gerard_Mercator%2C_ca._1550.tif/lossy-page1-460px-Workshop_of_Titian_-_Gerard_Mercator%2C_ca._1550.tif.jpg[Gerardus Mercator]
+https://en.wikipedia.org/wiki/Gerardus_Mercator[Gerardus Mercator] was an influential cartographer who also liked making maps.
+I'm pretty sure he would approve of a map construction macro.
+So you should too.

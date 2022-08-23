@@ -10,13 +10,13 @@ A map constructor for Clojure/Script
 which emulates JavaScript's ES6 object creation shorthand
 by introducing shorthand notation.
 
-    {io.chouser/spread {:mvn/version "0.0.1"}}
+    {us.chouser/spread {:mvn/version "0.0.1"}}
 
 == Usage
 
 [source,clojure]
 ----
-(require '[io.chouser.spread :refer [k.]])
+(require '[us.chouser.spread :refer [k.]])
 
 (k. :a "alpha")          ;;=> {:a "alpha"}
 
@@ -25,7 +25,7 @@ by introducing shorthand notation.
 
 (let [b "beta"
       m {:x 7, :y 9}]
-  (k. b, ...m))          ;;=> {:b "beta" :x 7 :y 9}
+  (k. b, ~@m))          ;;=> {:b "beta" :x 7 :y 9}
 ----
 
 Mix and match keyword/value pairs, bare symbols, and ellipsis (spread) prefixes
@@ -37,6 +37,8 @@ in https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/O
 The `k.` macro (a.k.a. `keys.`) works well for constructing
 maps that will be destructured with `{:keys []}`. Also available are `strs.` and
 `syms.` macros for `{:strs []}` and `{:syms []}` destructuring respectively.
+
+See link:src/test/us.chouser/spread_test.clj[] for all usages.
 
 === Sequences, vectors and sets
 
@@ -61,6 +63,14 @@ without considering the effects of unsplicing:
 ----
 
 Improving the Clojure reader to handle this case would appear to be a reasonable thing to do.
+
+It is possible to trick the reader by providing 2 `~@` forms:
+
+[source,clojure]
+----
+`{0 1 ~@(range 2 4) ~@nil}
+=> {0 1, 2 3}
+----
 
 Alternative notations considered were `...` and `&` which are both interesting.
 `&` is symmetrical with destructuring.
@@ -91,6 +101,10 @@ Given some pre-existing bindings...
 
 `(k. ~a ~b)` => `{"alpha" "beta"}`
 
+=== Symbol pairing only occurs in the key position
+
+`(k. ~a b)` => `{"alpha" "beta"}`
+
 === Spreading
 
 `(k. ~@m)` => `{:foo :bar}`
@@ -102,13 +116,11 @@ Given some pre-existing bindings...
 === Mixing, matching, and composing
 
 `(k. a b :c 3 ~a 5 ~@m ~@(range 10 14) ~@(strs. a b))`
+=> `{:a "alpha", :b "beta", :c 3, "alpha" 5, :foo :bar, 10 11, 12 13, "a" "alpha", "b" "beta"}`
 
-=> `{:a 1, :b 2, :c 3, 1 5, :foo :bar, 10 11, 12 13, "a" "alpha", "b" "beta"}`
-
-
-== Final throughts
+== Final thoughts
 
 image::https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Workshop_of_Titian_-_Gerard_Mercator%2C_ca._1550.tif/lossy-page1-460px-Workshop_of_Titian_-_Gerard_Mercator%2C_ca._1550.tif.jpg[Gerardus Mercator]
-https://en.wikipedia.org/wiki/Gerardus_Mercator[Gerardus Mercator] was an influencial cartographer who also liked making maps.
+https://en.wikipedia.org/wiki/Gerardus_Mercator[Gerardus Mercator] was an influential cartographer who also liked making maps.
 I'm pretty sure he would approve of a map construction macro.
 So you should too.

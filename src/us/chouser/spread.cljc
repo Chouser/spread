@@ -1,14 +1,13 @@
 (ns us.chouser.spread)
 
-(def mapcat-identity (mapcat identity))
-
 (defn ^:private add-to-maps [maps k v]
   (if (map? (peek maps))
     (conj (pop maps) (assoc (peek maps) k v))
     (conj maps {k v})))
 
 (defn ^:private build-map [form key-fn]
-  (loop [[k & [maybe-val :as more] :as args] (rest form), maps []]
+  (loop [[k & [maybe-val :as more] :as args] (rest form),
+         maps []]
     (cond
       (empty? args) (cond
                       (next maps) `(reduce into {} [~@maps])

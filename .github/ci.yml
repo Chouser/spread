@@ -1,0 +1,29 @@
+name: ci
+'on':
+  push:
+    branches:
+      - '**'
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+      - name: 'Maven cache'
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: 'Setup Java'
+        uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: 11
+      - name: 'Setup Clojure'
+        uses: DeLaGuardo/setup-clojure@3.5
+        with:
+          cli: 1.10.3.986
+      - name: 'Make'
+        run: make

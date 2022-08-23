@@ -21,13 +21,19 @@
   (is (= {1 2 3 4} (k. ~@m1234)))
   (is (= {1 2 3 4} (k. ~@[[1 2] [3 4]])))
   (is (= {:s 0 :p 1 :q 2 :r 3} (k. ~@(map vector [:s :p :q :r] (range)))))
+  (is (= {:a a :k 1} (k. a ~@{:k 1})))
   (is (= {:us.chouser.spread-test/a "alpha"} (k. us.chouser.spread-test/a))))
 
 (deftest all-macros
+  (is (= {"a" "alpha"} (strs. a)))
+  (is (= {'a "alpha"} (syms. a)))
   (is (= (merge {:a a :b b} mef) (k.    a ~@mef b)))
   (is (= (merge {:a a :b b} mef) (keys. a ~@mef b)))
   (is (= (merge {"a" a "b" b} mef) (strs. a ~@mef b)))
-  (is (= (merge {'a a 'b b} mef) (syms. a ~@mef b))))
+  (is (= (merge {'a a 'b b} mef) (syms. a ~@mef b)))
+  (is (= {:a "alpha", 'b "beta", "a" "alpha"}
+         (keys. a ~@(syms. b) ~@(strs. a)))
+      "should be composable"))
 
 (deftest simplified
   (is (= '{:a a :b b} (macroexpand '(k. a b))))
@@ -37,6 +43,10 @@
   (is (= `(into {} ~'mcd) (macroexpand '(k. ~@mcd)))))
 
 (deftest combinations
+  (is (= {'a "alpha", 'b "beta", 'c "beta", :s :t,
+          :c "charlie", :d "delta", :e 3, :f 4, :more "stuff", :k 1, :p 0, :q 1, :r 2}
+         (syms. a b 'c b ~@{:s :t} ~@mcd ~@mef :more "stuff" ~@{:k 1} ~@(map vector [:p :q :r] (range))))
+      "should support weird combinations")
   (dotimes [_ 100]
     (let [words (->> '[[a] [b] [~@mcd] [~@mef] [:g "golf"] [:h "hotel"]]
                      (sort-by (fn [_] (rand)))
@@ -57,4 +67,7 @@
       "An expression that returns empty seq should result in an empty map")
   (is (= {} (k. ~@nil))
       "An expression that returns nil should result in an empty map")
-  (is (= {} (k. ~@[]))))
+  (is (= {} (k. ~@[])))
+  (is (= {:a "alpha"} (k. :a 1 a)))
+  (is (= {:a 1} (k. a :a 1)))
+  (is (= {:a 1} (k. ~:a b :a 1))))

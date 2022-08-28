@@ -1,5 +1,6 @@
 (ns us.chouser.spread-test
   (:require [us.chouser.spread :refer [k. keys. strs. syms.] :as s]
+            [clojure.core.reducers :as r]
             [clojure.test :refer [deftest is use-fixtures]]))
 
 (def a "alpha")
@@ -60,7 +61,7 @@
   (is (= `(into {} ~'mcd) (macroexpand '(k. ~@ mcd))))
   (is (= '{:a 1} (macroexpand '(k. ~@{:a 1}))))
   (is (= '{:a a :b 2} (macroexpand '(k. a ~@{:b 2}))))
-  (is (= `(reduce into {} [{:a ~'a} ~'mef]) (macroexpand '(k. a ~@mef)))))
+  (is (= `(into {} (r/mapcat seq [{:a ~'a} ~'mef])) (macroexpand '(k. a ~@mef)))))
 
 (deftest combinations
   (is (= {'a "alpha", 'b "beta", 'c "beta", :s :t,
@@ -93,3 +94,9 @@
   (is (= {:a "alpha"} (k. :a 1 a)))
   (is (= {:a 1} (k. a :a 1)))
   (is (= {:a 1} (k. ~:a b :a 1))))
+
+(comment
+  (defmacro big-k []
+    `(k. ~@(repeat 1000 '~@[[1 2]])))
+
+  (time (big-k)))

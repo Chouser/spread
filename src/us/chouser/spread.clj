@@ -1,4 +1,5 @@
-(ns us.chouser.spread)
+(ns us.chouser.spread
+  (:require [clojure.core.reducers :as r]))
 
 (defn ^:private collect-expr
   "Conj expr onto the vector exprs, unless expr is a literal map that can be
@@ -34,7 +35,7 @@
   (let [maps (map-exprs form key-fn)
         m (first maps)]
     (cond
-      (next maps) `(reduce into {} [~@maps])
+      (next maps) `(into {} (r/mapcat seq [~@maps]))
       (map? m) m
       (seq maps) `(into {} ~m)
       :else {})))

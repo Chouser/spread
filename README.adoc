@@ -10,6 +10,10 @@ A map constructor for Clojure/Script
 which emulates JavaScript's ES6 object creation shorthand
 by introducing shorthand notation.
 
+== Installation
+
+Add `us.chouser/spread` as a project dependency:
+
     {us.chouser/spread {:mvn/version "0.0.1"}}
 
 == Usage
@@ -18,14 +22,17 @@ by introducing shorthand notation.
 ----
 (require '[us.chouser.spread :refer [k.]])
 
-(k. :a "alpha")          ;;=> {:a "alpha"}
+(k. :a "alpha")
+;;=> {:a "alpha"}
 
-(let [b "beta"]
-  (k. b, :c "charlie"))  ;;=> {:b "beta" :c "charlie"}
+(let [well-named-thing "beta"]
+  (k. well-named-thing, :c "charlie"))
+;;=> {:well-named-thing "beta" :c "charlie"}
 
-(let [b "beta"
+(let [well-named-thing "beta"
       m {:x 7, :y 9}]
-  (k. b, ~@m))          ;;=> {:b "beta" :x 7 :y 9}
+  (k. well-named-thing, ~@m))
+;;=> {:well-named-thing "beta" :x 7 :y 9}
 ----
 
 Mix and match keyword/value pairs, bare symbols, and ellipsis (spread) prefixes
@@ -47,6 +54,9 @@ Clojure has a built-in spread operator that you should prefer:
     `[0 1 ~@(range 2 4)] => [0 1 2 3]
 
 == Rationale
+
+I don’t want to be penalized for choosing long symbol names when it comes to putting them into a map.
+Descriptive symbol/key names are desirable and a shorthand constructor makes them more practical.
 
 ES6 introduced object initialization shorthand notation to JavaScript,
 which has been widely adopted and accepted as a concise and clear way to create data literals.

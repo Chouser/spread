@@ -31,7 +31,16 @@
   (is (= {1 2 3 4} (k. ~@[[1 2] [3 4]])))
   (is (= {:s 0 :p 1 :q 2 :r 3} (k. ~@(map vector [:s :p :q :r] (range)))))
   (is (= {:a a :k 1} (k. a ~@{:k 1})))
-  (is (= {:us.chouser.spread-test/a "alpha"} (k. us.chouser.spread-test/a))))
+  (is (= {:us.chouser.spread-test/a "alpha"} (k. us.chouser.spread-test/a)))
+  (is (= {[1 2] "beta" :a "alpha"} (k. [1 2] b a)))
+  (is (= {'{a b} "beta" :a "alpha"} (k. '{a b} b a)))
+  (is (= {0 1, 2 3} (k. ~@(apply array-map (range 4)))))
+  (is (= {:a "alpha", :b "beta", :c 3, "alpha" 5, :e 3, :f 4,
+          10 11, 12 13,
+          "a" "alpha", "b" "beta"}
+         (k. a b :c 3 ~a 5 ~@mef
+             ~@(apply array-map (range 10 14))
+             ~@(strs. a b)))))
 
 (deftest all-macros
   (is (= {"a" "alpha"} (strs. a)))
@@ -49,7 +58,9 @@
   (is (= '{:a a :h "hotel"} (macroexpand '(k. :h "hotel", a))))
   (is (= `(into {} ~'m1234) (macroexpand '(k. ~@m1234))))
   (is (= `(into {} ~'mcd) (macroexpand '(k. ~@ mcd))))
-  (is (= `(into {} ~'mcd) (macroexpand '(k. ~@mcd)))))
+  (is (= '{:a 1} (macroexpand '(k. ~@{:a 1}))))
+  (is (= `(reduce into {} [{:a ~'a} {:b 2}]) (macroexpand '(k. a ~@{:b 2}))))
+  (is (= `(reduce into {} [{:a ~'a} ~'mef]) (macroexpand '(k. a ~@mef)))))
 
 (deftest combinations
   (is (= {'a "alpha", 'b "beta", 'c "beta", :s :t,
@@ -65,7 +76,9 @@
 
 (deftest errors
   (is (thrown-with-msg? Exception #"No value supplied"
-                        (#'s/build-map '(k. a :x) keyword))))
+                        (#'s/build-map '(k. a :x) keyword)))
+  (is (thrown-with-msg? Exception #"ISeq from:.*Long"
+                        (k. ~@(range 4)))))
 
 (deftest corner-cases
   (is (= {} (k.))

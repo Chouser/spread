@@ -1,30 +1,43 @@
 (ns us.chouser.spread)
 
-(defn ^:private collect-expr [exprs expr]
+(defn ^:private collect-expr
+  "Conj expr onto the vector exprs, unless expr is a literal map that can be
+  merged into a existing map at the end of the vector."
+  [exprs expr]
   (if (and (map? (peek exprs)) (map? expr))
     (conj (pop exprs) (merge (peek exprs) expr))
     (conj exprs expr)))
 
-(defn ^:private build-map [form key-fn]
-  (loop [[k & [maybe-val :as more] :as args] (rest form),
+(defn ^:private first= [x expr]
+  (and (seq? expr) (= x (first expr))))
+
+(defn ^:private map-exprs
+  "Convert the given macro invocation form into a vector of expressions that
+  evaluate to maps. Bare symbols are converted to maps with one entry with a val
+  of the symbol and a key converted by key-fn."
+  [form key-fn]
+  (loop [[k maybe-val :as args] (rest form),
          maps []]
     (cond
-      (empty? args) (cond
-                      (next maps) `(reduce into {} [~@maps])
-                      (seq maps) (let [m (first maps)]
-                                   (if (map? m)
-                                     m
-                                     `(into {} ~m)))
-                      :else {})
-      (symbol? k) (recur more (collect-expr maps {(key-fn k) k}))
-      (and (seq? k)
-           (= `unquote-splicing (first k))) (recur more (collect-expr maps (second k)))
-      (and (seq? k)
-           (= `unquote (first k))) (recur (rest more)
-                                          (collect-expr maps {(second k) maybe-val}))
-      (seq more) (recur (rest more) (collect-expr maps {k maybe-val}))
+      (empty? args) maps
+      (symbol? k) (recur (next args) (collect-expr maps {(key-fn k) k}))
+      (first= `unquote-splicing k) (recur (next args)
+                                          (collect-expr maps (second k)))
+      (first= `unquote k) (recur (nnext args)
+                                 (collect-expr maps {(second k) maybe-val}))
+      (next args) (recur (nnext args) (collect-expr maps {k maybe-val}))
       :else (throw (ex-info (format "No value supplied for key %s" (pr-str k))
                             {:id ::no-value :key k :form form})))))
+
+(defn ^:private build-map
+  [form key-fn]
+  (let [maps (map-exprs form key-fn)
+        m (first maps)]
+    (cond
+      (next maps) `(reduce into {} [~@maps])
+      (map? m) m
+      (seq maps) `(into {} ~m)
+      :else {})))
 
 (defmacro k.    [& args] (build-map &form keyword))
 (defmacro keys. [& args] (build-map &form keyword))

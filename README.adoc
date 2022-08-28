@@ -38,7 +38,7 @@ The `k.` macro (a.k.a. `keys.`) works well for constructing
 maps that will be destructured with `{:keys []}`. Also available are `strs.` and
 `syms.` macros for `{:strs []}` and `{:syms []}` destructuring respectively.
 
-See link:src/test/us.chouser/spread_test.clj[] for all usages.
+See link:test/us/chouser/spread_test.cljc[] for all usages.
 
 === Sequences, vectors and sets
 

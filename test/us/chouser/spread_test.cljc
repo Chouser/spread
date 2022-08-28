@@ -61,6 +61,7 @@
   (is (= `(into {} ~'mcd) (macroexpand '(k. ~@ mcd))))
   (is (= '{:a 1} (macroexpand '(k. ~@{:a 1}))))
   (is (= '{:a a :b 2} (macroexpand '(k. a ~@{:b 2}))))
+  (is (= '{:a a :b b :c 3} (macroexpand '(k. a ~@{:b 2} ~@{:c 3} b))))
   (is (= `(into {} (r/mapcat seq [{:a ~'a} ~'mef])) (macroexpand '(k. a ~@mef)))))
 
 (deftest combinations
@@ -88,8 +89,6 @@
       "An expression that returns nil should result in an empty map")
   (is (= {} (k. ~@()))
       "An expression that returns empty seq should result in an empty map")
-  (is (= {} (k. ~@nil))
-      "An expression that returns nil should result in an empty map")
   (is (= {} (k. ~@[])))
   (is (= {:a "alpha"} (k. :a 1 a)))
   (is (= {:a 1} (k. a :a 1)))

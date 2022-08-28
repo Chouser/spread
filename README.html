@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.16">
+<meta name="generator" content="Asciidoctor 2.0.17">
 <title>The map constructor</title>
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -665,6 +665,7 @@ pre.rouge {
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_the_map_constructor">The map constructor</a></li>
+<li><a href="#_installation">Installation</a></li>
 <li><a href="#_usage">Usage</a>
 <ul class="sectlevel2">
 <li><a href="#_sequences_vectors_and_sets">Sequences, vectors and sets</a></li>
@@ -694,6 +695,14 @@ pre.rouge {
 which emulates JavaScript&#8217;s ES6 object creation shorthand
 by introducing shorthand notation.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installation"><a class="anchor" href="#_installation"></a>Installation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Add <code>us.chouser/spread</code> as a project dependency:</p>
+</div>
 <div class="literalblock">
 <div class="content">
 <pre>{us.chouser/spread {:mvn/version "0.0.1"}}</pre>
@@ -708,14 +717,17 @@ by introducing shorthand notation.</p>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="clojure"><span class="p">(</span><span class="nf">require</span><span class="w"> </span><span class="o">'</span><span class="p">[</span><span class="n">us.chouser.spread</span><span class="w"> </span><span class="no">:refer</span><span class="w"> </span><span class="p">[</span><span class="n">k.</span><span class="p">]])</span><span class="w">
 
-</span><span class="p">(</span><span class="nf">k.</span><span class="w"> </span><span class="no">:a</span><span class="w"> </span><span class="s">"alpha"</span><span class="p">)</span><span class="w">          </span><span class="c1">;;=&gt; {:a "alpha"}</span><span class="w">
+</span><span class="p">(</span><span class="nf">k.</span><span class="w"> </span><span class="no">:a</span><span class="w"> </span><span class="s">"alpha"</span><span class="p">)</span><span class="w">
+</span><span class="c1">;;=&gt; {:a "alpha"}</span><span class="w">
 
-</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">b</span><span class="w"> </span><span class="s">"beta"</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nf">k.</span><span class="w"> </span><span class="n">b,</span><span class="w"> </span><span class="no">:c</span><span class="w"> </span><span class="s">"charlie"</span><span class="p">))</span><span class="w">  </span><span class="c1">;;=&gt; {:b "beta" :c "charlie"}</span><span class="w">
+</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">well-named-thing</span><span class="w"> </span><span class="s">"beta"</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="nf">k.</span><span class="w"> </span><span class="n">well-named-thing,</span><span class="w"> </span><span class="no">:c</span><span class="w"> </span><span class="s">"charlie"</span><span class="p">))</span><span class="w">
+</span><span class="c1">;;=&gt; {:well-named-thing "beta" :c "charlie"}</span><span class="w">
 
-</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">b</span><span class="w"> </span><span class="s">"beta"</span><span class="w">
+</span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">well-named-thing</span><span class="w"> </span><span class="s">"beta"</span><span class="w">
       </span><span class="n">m</span><span class="w"> </span><span class="p">{</span><span class="no">:x</span><span class="w"> </span><span class="mi">7</span><span class="n">,</span><span class="w"> </span><span class="no">:y</span><span class="w"> </span><span class="mi">9</span><span class="p">}]</span><span class="w">
-  </span><span class="p">(</span><span class="nf">k.</span><span class="w"> </span><span class="n">b,</span><span class="w"> </span><span class="o">~@</span><span class="n">m</span><span class="p">))</span><span class="w">          </span><span class="c1">;;=&gt; {:b "beta" :x 7 :y 9}</span></code></pre>
+  </span><span class="p">(</span><span class="nf">k.</span><span class="w"> </span><span class="n">well-named-thing,</span><span class="w"> </span><span class="o">~@</span><span class="n">m</span><span class="p">))</span><span class="w">
+</span><span class="c1">;;=&gt; {:well-named-thing "beta" :x 7 :y 9}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -731,7 +743,7 @@ maps that will be destructured with <code>{:keys []}</code>. Also available are 
 <code>syms.</code> macros for <code>{:strs []}</code> and <code>{:syms []}</code> destructuring respectively.</p>
 </div>
 <div class="paragraph">
-<p>See <a href="src/test/us.chouser/spread_test.clj" class="bare">src/test/us.chouser/spread_test.clj</a> for all usages.</p>
+<p>See <a href="test/us/chouser/spread_test.cljc" class="bare">test/us/chouser/spread_test.cljc</a> for all usages.</p>
 </div>
 <div class="sect2">
 <h3 id="_sequences_vectors_and_sets"><a class="anchor" href="#_sequences_vectors_and_sets"></a>Sequences, vectors and sets</h3>
@@ -749,6 +761,10 @@ maps that will be destructured with <code>{:keys []}</code>. Also available are 
 <div class="sect1">
 <h2 id="_rationale"><a class="anchor" href="#_rationale"></a>Rationale</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>I don’t want to be penalized for choosing long symbol names when it comes to putting them into a map.
+Descriptive symbol/key names are desirable and a shorthand constructor makes them more practical.</p>
+</div>
 <div class="paragraph">
 <p>ES6 introduced object initialization shorthand notation to JavaScript,
 which has been widely adopted and accepted as a concise and clear way to create data literals.
@@ -858,7 +874,7 @@ So you should too.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-08-27 23:10:28 -0400
+Last updated 2022-08-28 14:29:39 -0700
 </div>
 </div>
 </body>

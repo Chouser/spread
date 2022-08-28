@@ -1,9 +1,9 @@
 (ns us.chouser.spread)
 
-(defn ^:private add-to-maps [maps k v]
-  (if (map? (peek maps))
-    (conj (pop maps) (assoc (peek maps) k v))
-    (conj maps {k v})))
+(defn ^:private collect-expr [exprs expr]
+  (if (and (map? (peek exprs)) (map? expr))
+    (conj (pop exprs) (merge (peek exprs) expr))
+    (conj exprs expr)))
 
 (defn ^:private build-map [form key-fn]
   (loop [[k & [maybe-val :as more] :as args] (rest form),
@@ -16,13 +16,13 @@
                                      m
                                      `(into {} ~m)))
                       :else {})
-      (symbol? k) (recur more (add-to-maps maps (key-fn k) k))
+      (symbol? k) (recur more (collect-expr maps {(key-fn k) k}))
       (and (seq? k)
-           (= `unquote-splicing (first k))) (recur more (conj maps (second k)))
+           (= `unquote-splicing (first k))) (recur more (collect-expr maps (second k)))
       (and (seq? k)
            (= `unquote (first k))) (recur (rest more)
-                                          (add-to-maps maps (second k) maybe-val))
-      (seq more) (recur (rest more) (add-to-maps maps k maybe-val))
+                                          (collect-expr maps {(second k) maybe-val}))
+      (seq more) (recur (rest more) (collect-expr maps {k maybe-val}))
       :else (throw (ex-info (format "No value supplied for key %s" (pr-str k))
                             {:id ::no-value :key k :form form})))))
 

@@ -59,7 +59,7 @@
   (is (= `(into {} ~'m1234) (macroexpand '(k. ~@m1234))))
   (is (= `(into {} ~'mcd) (macroexpand '(k. ~@ mcd))))
   (is (= '{:a 1} (macroexpand '(k. ~@{:a 1}))))
-  (is (= `(reduce into {} [{:a ~'a} {:b 2}]) (macroexpand '(k. a ~@{:b 2}))))
+  (is (= '{:a a :b 2} (macroexpand '(k. a ~@{:b 2}))))
   (is (= `(reduce into {} [{:a ~'a} ~'mef]) (macroexpand '(k. a ~@mef)))))
 
 (deftest combinations
